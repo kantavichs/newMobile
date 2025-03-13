@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -151,6 +152,14 @@ class PendingFragment : Fragment() {
     }
 
     private fun navigateToSummary(incidentId: String) {
+        // เพิ่ม log เพื่อตรวจสอบ
+        Log.d("PendingFragment", "Navigating to summary with incidentId: $incidentId")
+
+        if (incidentId.isEmpty()) {
+            Toast.makeText(requireContext(), "ไม่สามารถดูรายละเอียดได้เนื่องจากไม่มีรหัสเหตุการณ์", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         val intent = Intent(requireContext(), SummaryActivity::class.java)
         intent.putExtra("incidentId", incidentId)
         startActivity(intent)

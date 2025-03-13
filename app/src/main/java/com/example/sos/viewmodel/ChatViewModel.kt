@@ -1,17 +1,21 @@
 package com.example.sos.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.sos.models.ChatRoom
 import com.example.sos.models.Message
 import com.example.sos.repository.ChatRepository
+import com.google.firebase.auth.FirebaseAuth
 
 class ChatViewModel : ViewModel() {
     private val chatRepository = ChatRepository()
+    private val TAG = "ChatViewModel"
 
     // ฟังก์ชันดึงข้อความทั้งหมดในห้องแชท
     fun getMessages(chatId: String): LiveData<List<Message>> {
+        Log.d(TAG, "Getting messages for chatId: $chatId")
         return chatRepository.getMessagesForChatRoom(chatId)
     }
 
@@ -23,11 +27,13 @@ class ChatViewModel : ViewModel() {
             return result
         }
 
+        Log.d(TAG, "Sending message to chatId: $chatId")
         return chatRepository.sendMessage(chatId, messageText)
     }
 
     // ฟังก์ชันดึงข้อมูลห้องแชท
     fun getChatRoom(chatId: String): LiveData<ChatRoom> {
+        Log.d(TAG, "Getting chat room for chatId: $chatId")
         return chatRepository.getChatRoomById(chatId)
     }
 
@@ -36,13 +42,9 @@ class ChatViewModel : ViewModel() {
         return chatRoom.active
     }
 
-    // ฟังก์ชันจัดกลุ่มข้อความตามวันที่
-    fun groupMessagesByDate(messages: List<Message>): Map<String, List<Message>> {
-        return messages.groupBy { it.getFormattedDate() }
-    }
-
-    // ฟังก์ชันนับจำนวนข้อความที่ยังไม่ได้อ่าน
-    fun countUnreadMessages(messages: List<Message>, currentUserId: String): Int {
-        return messages.count { !it.read && !it.isCurrentUser(currentUserId) }
+    // ฟังก์ชันตรวจสอบว่าข้อความเป็นของผู้ใช้ปัจจุบันหรือไม่
+    fun isCurrentUserMessage(message: Message): Boolean {
+        val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+        return message.senderId == currentUserId
     }
 }

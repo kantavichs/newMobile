@@ -4,6 +4,7 @@ import android.app.Dialog
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.Window
 import android.view.inputmethod.EditorInfo
 import android.widget.Button
@@ -17,6 +18,7 @@ import com.example.sos.databinding.ActivitySurvivalGuidesBinding
 import com.example.sos.models.SurvivalGuide
 import com.example.sos.viewmodel.GuidesViewModel
 import com.google.android.material.chip.Chip
+import android.view.View
 
 // SurvivalGuidesActivity.kt
 class SurvivalGuidesActivity : AppCompatActivity() {
@@ -33,8 +35,16 @@ class SurvivalGuidesActivity : AppCompatActivity() {
 
         guidesViewModel = ViewModelProvider(this).get(GuidesViewModel::class.java)
 
+        // เพิ่ม logging เพื่อดีบัก
+        Log.d("SurvivalGuidesActivity", "Activity created, setting up...")
+
+        // แสดงสถานะ loading
+        binding.progressBar.visibility = View.VISIBLE
+        binding.emptyView.visibility = View.GONE
+
         // ตั้งค่า RecyclerView
         adapter = GuidesAdapter { guide ->
+            Log.d("SurvivalGuidesActivity", "Guide selected: ${guide.id} - ${guide.title}")
             showGuideDialog(guide)
         }
         binding.rvGuides.layoutManager = LinearLayoutManager(this)
@@ -48,15 +58,25 @@ class SurvivalGuidesActivity : AppCompatActivity() {
 
         // โหลดข้อมูลคู่มือ
         guidesViewModel.getAllGuides().observe(this) { guides ->
+            binding.progressBar.visibility = View.GONE
+
+            Log.d("SurvivalGuidesActivity", "Guides loaded: ${guides.size}")
+
+            // เพื่อการดีบัก แสดงรายการคู่มือที่โหลดได้
+            for (guide in guides) {
+                Log.d("SurvivalGuidesActivity", "Guide: ${guide.id} - ${guide.title} (${guide.incidentType})")
+            }
+
             allGuides = guides
             adapter.submitList(guides)
-            binding.progressBar.visibility = android.view.View.GONE
 
             // แสดงข้อความว่างเมื่อไม่มีข้อมูล
             if (guides.isEmpty()) {
-                binding.emptyView.visibility = android.view.View.VISIBLE
+                binding.emptyView.visibility = View.VISIBLE
+                binding.rvGuides.visibility = View.GONE
             } else {
-                binding.emptyView.visibility = android.view.View.GONE
+                binding.emptyView.visibility = View.GONE
+                binding.rvGuides.visibility = View.VISIBLE
             }
         }
 

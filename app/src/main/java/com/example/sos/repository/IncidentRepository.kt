@@ -118,19 +118,30 @@ class IncidentRepository {
     fun getIncidentLiveUpdates(incidentId: String): LiveData<Incident> {
         val incidentLiveData = MutableLiveData<Incident>()
 
+        Log.d(TAG, "Fetching incident details for ID: $incidentId")
+
+        if (incidentId.isEmpty()) {
+            Log.e(TAG, "Empty incidentId provided")
+            return incidentLiveData
+        }
+
         incidentsCollection.document(incidentId)
             .addSnapshotListener { snapshot, e ->
                 if (e != null) {
-                    Log.e(TAG, "Listen failed: ${e.message}")
+                    Log.e(TAG, "Error getting incident: ${e.message}")
                     return@addSnapshotListener
                 }
 
                 if (snapshot != null && snapshot.exists()) {
                     val incident = snapshot.toObject(Incident::class.java)
-                    incidentLiveData.value = incident
-                    Log.d(TAG, "Incident updated: ${incident?.id}, status: ${incident?.status}")
+                    if (incident != null) {
+                        incidentLiveData.value = incident
+                        Log.d(TAG, "Incident updated: ${incident.id}, status: ${incident.status}, location: ${incident.location}")
+                    } else {
+                        Log.e(TAG, "Failed to convert document to Incident object")
+                    }
                 } else {
-                    Log.d(TAG, "Incident document does not exist")
+                    Log.e(TAG, "Incident document does not exist for ID: $incidentId")
                 }
             }
 

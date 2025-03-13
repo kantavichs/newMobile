@@ -1,5 +1,6 @@
 package com.example.sos.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import com.example.sos.models.SurvivalGuide
@@ -10,6 +11,7 @@ class GuidesViewModel : ViewModel() {
 
     // ฟังก์ชันดึงคู่มือเอาตัวรอดทั้งหมด
     fun getAllGuides(): LiveData<List<SurvivalGuide>> {
+        Log.d("GuidesViewModel", "Getting all guides")
         return guidesRepository.getAllGuides()
     }
 

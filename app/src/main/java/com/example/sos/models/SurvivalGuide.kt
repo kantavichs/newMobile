@@ -5,7 +5,7 @@ data class SurvivalGuide(
     val id: String = "",
     val title: String = "",
     val content: String = "",
-    val incidentType: String = "", // เกี่ยวข้องกับประเภทเหตุการณ์ใด (อุบัติเหตุบนถนน, จับสัตว์, ทะเลาะวิวาท, etc.)
+    val incidentType: String = "",
     val imageUrl: String = "",
     val createdAt: Long = System.currentTimeMillis(),
     val updatedAt: Long = System.currentTimeMillis()

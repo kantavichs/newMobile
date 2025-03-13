@@ -1,16 +1,17 @@
 package com.example.sos.adapter
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.sos.R
 import com.example.sos.models.Message
 import com.google.firebase.auth.FirebaseAuth
+import java.util.ArrayList
 
 class MessageAdapter : ListAdapter<Message, RecyclerView.ViewHolder>(MessageDiffCallback()) {
 
@@ -18,26 +19,31 @@ class MessageAdapter : ListAdapter<Message, RecyclerView.ViewHolder>(MessageDiff
     private val VIEW_TYPE_OTHER_MESSAGE = 2
     private val VIEW_TYPE_DATE_HEADER = 3
 
-    private var lastDate: String = ""
     private val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+    private val TAG = "MessageAdapter"
+
+    // เพิ่มตัวแปรเก็บข้อมูลเฉพาะภายใน adapter
+    private var messageList = ArrayList<Message>()
+    private var processedList = ArrayList<Any>() // จะเก็บทั้ง Message และ DateHeader
+
+    // คลาสสำหรับ DateHeader
+    data class DateHeader(val date: String)
+
+    override fun getItemCount(): Int = processedList.size
 
     override fun getItemViewType(position: Int): Int {
-        val message = getItem(position)
+        val item = processedList[position]
 
-        // Check if this is the first message or if the date has changed from the previous message
-        if (position == 0 || !getItem(position - 1).getFormattedDate().equals(message.getFormattedDate())) {
-            return VIEW_TYPE_DATE_HEADER
-        }
-
-        // Determine if this is a user's message or someone else's
-        return if (message.senderId == currentUserId) {
-            VIEW_TYPE_MY_MESSAGE
-        } else {
-            VIEW_TYPE_OTHER_MESSAGE
+        return when (item) {
+            is DateHeader -> VIEW_TYPE_DATE_HEADER
+            is Message -> if (item.senderId == currentUserId) VIEW_TYPE_MY_MESSAGE else VIEW_TYPE_OTHER_MESSAGE
+            else -> throw IllegalArgumentException("Unknown view type")
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        Log.d(TAG, "Creating view holder of type: $viewType")
+
         return when (viewType) {
             VIEW_TYPE_MY_MESSAGE -> {
                 val view = LayoutInflater.from(parent.context)
@@ -49,25 +55,69 @@ class MessageAdapter : ListAdapter<Message, RecyclerView.ViewHolder>(MessageDiff
                     .inflate(R.layout.item_message_received, parent, false)
                 ReceivedMessageViewHolder(view)
             }
-            else -> { // VIEW_TYPE_DATE_HEADER
+            VIEW_TYPE_DATE_HEADER -> {
                 val view = LayoutInflater.from(parent.context)
                     .inflate(R.layout.item_date_header, parent, false)
                 DateHeaderViewHolder(view)
             }
+            else -> throw IllegalArgumentException("Unknown view type")
         }
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        val message = getItem(position)
-
-        when (holder) {
-            is MySentMessageViewHolder -> holder.bind(message)
-            is ReceivedMessageViewHolder -> holder.bind(message)
-            is DateHeaderViewHolder -> {
-                // For date headers, bind the date
-                holder.bind(message.getFormattedDate())
+        try {
+            when (holder) {
+                is MySentMessageViewHolder -> {
+                    val message = processedList[position] as Message
+                    holder.bind(message)
+                }
+                is ReceivedMessageViewHolder -> {
+                    val message = processedList[position] as Message
+                    holder.bind(message)
+                }
+                is DateHeaderViewHolder -> {
+                    val dateHeader = processedList[position] as DateHeader
+                    holder.bind(dateHeader.date)
+                }
             }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error binding view holder: ${e.message}")
         }
+    }
+
+    // ทำ override เมธอดนี้เพื่อไม่ให้ใช้ ListAdapter ปกติ
+    override fun submitList(list: List<Message>?) {
+        if (list == null) return
+
+        // บันทึกข้อมูลเดิม
+        messageList = ArrayList(list)
+
+        // แปลงข้อมูลให้มี date header
+        processedList = processMessageList(messageList)
+
+        // แจ้ง adapter ว่าข้อมูลเปลี่ยน
+        notifyDataSetChanged()
+    }
+
+    // เมธอดเพื่อจัดการกับ date header
+    private fun processMessageList(messages: List<Message>): ArrayList<Any> {
+        val result = ArrayList<Any>()
+        var currentDate = ""
+
+        for (message in messages) {
+            val messageDate = message.getFormattedDate()
+
+            // ถ้าวันที่เปลี่ยน ให้เพิ่ม header
+            if (messageDate != currentDate) {
+                currentDate = messageDate
+                result.add(DateHeader(messageDate))
+            }
+
+            // เพิ่มข้อความ
+            result.add(message)
+        }
+
+        return result
     }
 
     // ViewHolder for messages sent by the current user
@@ -111,21 +161,5 @@ class MessageAdapter : ListAdapter<Message, RecyclerView.ViewHolder>(MessageDiff
         override fun areContentsTheSame(oldItem: Message, newItem: Message): Boolean {
             return oldItem == newItem
         }
-    }
-
-    // Override getItemCount to ensure we're accounting for date headers
-    override fun getItemCount(): Int {
-        val originalCount = super.getItemCount()
-        if (originalCount == 0) return 0
-
-        // Count date headers
-        var dateHeaderCount = 1 // Always at least one date header for the first message
-        for (i in 1 until originalCount) {
-            if (!getItem(i).getFormattedDate().equals(getItem(i - 1).getFormattedDate())) {
-                dateHeaderCount++
-            }
-        }
-
-        return originalCount // The ListAdapter will manage this for us with our getItemViewType override
     }
 }

@@ -22,7 +22,10 @@ class ChatRepository {
         val chatRoomsLiveData = MutableLiveData<List<ChatRoom>>()
         val userId = auth.currentUser?.uid
 
+        Log.d(TAG, "Getting chat rooms for user: $userId")
+
         if (userId == null) {
+            Log.e(TAG, "User not logged in")
             chatRoomsLiveData.value = emptyList()
             return chatRoomsLiveData
         }
@@ -37,12 +40,28 @@ class ChatRepository {
                     return@addSnapshotListener
                 }
 
-                if (snapshot != null && !snapshot.isEmpty) {
-                    val chatRooms = snapshot.toObjects(ChatRoom::class.java)
-                    chatRoomsLiveData.value = chatRooms
-                    Log.d(TAG, "Chat rooms retrieved: ${chatRooms.size}")
-                } else {
-                    Log.d(TAG, "No chat rooms found")
+                try {
+                    if (snapshot != null && !snapshot.isEmpty) {
+                        val chatRooms = snapshot.documents.mapNotNull { doc ->
+                            try {
+                                doc.toObject(ChatRoom::class.java)
+                            } catch (e: Exception) {
+                                Log.e(TAG, "Error converting chat room document: ${e.message}")
+                                null
+                            }
+                        }
+
+                        // เรียงลำดับตามเวลาข้อความล่าสุด (ล่าสุดอยู่บน)
+                        val sortedChatRooms = chatRooms.sortedByDescending { it.lastMessageTime }
+
+                        Log.d(TAG, "Chat rooms retrieved: ${sortedChatRooms.size}")
+                        chatRoomsLiveData.value = sortedChatRooms
+                    } else {
+                        Log.d(TAG, "No chat rooms found")
+                        chatRoomsLiveData.value = emptyList()
+                    }
+                } catch (ex: Exception) {
+                    Log.e(TAG, "Error processing chat rooms: ${ex.message}")
                     chatRoomsLiveData.value = emptyList()
                 }
             }
@@ -50,42 +69,21 @@ class ChatRepository {
         return chatRoomsLiveData
     }
 
-    // ดึงข้อความทั้งหมดในห้องแชท
-    fun getMessagesForChatRoom(chatRoomId: String): LiveData<List<Message>> {
-        val messagesLiveData = MutableLiveData<List<Message>>()
-
-        messagesCollection
-            .whereEqualTo("chatId", chatRoomId)
-            .orderBy("timestamp", Query.Direction.ASCENDING)
-            .addSnapshotListener { snapshot, e ->
-                if (e != null) {
-                    Log.e(TAG, "Listen failed: ${e.message}")
-                    messagesLiveData.value = emptyList()
-                    return@addSnapshotListener
-                }
-
-                if (snapshot != null && !snapshot.isEmpty) {
-                    val messages = snapshot.toObjects(Message::class.java)
-                    messagesLiveData.value = messages
-                    Log.d(TAG, "Messages retrieved: ${messages.size}")
-
-                    // อัพเดทสถานะการอ่านข้อความ
-                    updateReadStatus(chatRoomId)
-                } else {
-                    Log.d(TAG, "No messages found")
-                    messagesLiveData.value = emptyList()
-                }
-            }
-
-        return messagesLiveData
-    }
-
     // ส่งข้อความใหม่
     fun sendMessage(chatRoomId: String, messageText: String): LiveData<Boolean> {
         val resultLiveData = MutableLiveData<Boolean>()
         val userId = auth.currentUser?.uid
 
+        Log.d(TAG, "Attempting to send message for chatId: $chatRoomId")
+
         if (userId == null) {
+            Log.e(TAG, "User not logged in")
+            resultLiveData.value = false
+            return resultLiveData
+        }
+
+        if (chatRoomId.isEmpty()) {
+            Log.e(TAG, "Cannot send message: empty chatId")
             resultLiveData.value = false
             return resultLiveData
         }
@@ -101,11 +99,27 @@ class ChatRepository {
                         val newMessageRef = messagesCollection.document()
                         val currentTime = System.currentTimeMillis()
 
+                        // ตรวจสอบว่าชื่อผู้ส่งไม่ว่าง
+                        var senderName = chatRoom.userName
+                        if (senderName.isEmpty()) {
+                            // ถ้าไม่มีชื่อใน chatRoom ให้ดึงจาก users collection
+                            senderName = "ผู้ใช้งาน" // ค่าเริ่มต้น
+                            db.collection("users").document(userId).get().addOnSuccessListener { userDoc ->
+                                if (userDoc != null && userDoc.exists()) {
+                                    val firstName = userDoc.getString("firstName") ?: ""
+                                    val lastName = userDoc.getString("lastName") ?: ""
+                                    if (firstName.isNotEmpty() || lastName.isNotEmpty()) {
+                                        senderName = "$firstName $lastName".trim()
+                                    }
+                                }
+                            }
+                        }
+
                         val message = Message(
                             id = newMessageRef.id,
                             chatId = chatRoomId,
                             senderId = userId,
-                            senderName = chatRoom.userName,
+                            senderName = senderName,
                             senderType = "user",
                             message = messageText,
                             timestamp = currentTime,
@@ -124,11 +138,11 @@ class ChatRepository {
                                 resultLiveData.value = false
                             }
                     } else {
-                        Log.d(TAG, "Chat room is not active")
+                        Log.d(TAG, "Chat room is not active or null")
                         resultLiveData.value = false
                     }
                 } else {
-                    Log.d(TAG, "Chat room document not found")
+                    Log.e(TAG, "Chat room document not found")
                     resultLiveData.value = false
                 }
             }
@@ -139,6 +153,64 @@ class ChatRepository {
 
         return resultLiveData
     }
+
+    // ดึงข้อความทั้งหมดในห้องแชท
+    fun getMessagesForChatRoom(chatRoomId: String): LiveData<List<Message>> {
+        val messagesLiveData = MutableLiveData<List<Message>>()
+
+        Log.d(TAG, "Getting messages for chatId: $chatRoomId")
+
+        if (chatRoomId.isEmpty()) {
+            Log.e(TAG, "Cannot get messages: empty chatId")
+            messagesLiveData.value = emptyList()
+            return messagesLiveData
+        }
+
+        // ใช้ listener แบบ real-time เพื่อให้ได้ข้อมูลที่อัปเดตตลอดเวลา
+        messagesCollection
+            .whereEqualTo("chatId", chatRoomId)
+            .orderBy("timestamp", Query.Direction.ASCENDING)
+            .addSnapshotListener { snapshot, e ->
+                if (e != null) {
+                    Log.e(TAG, "Error getting messages: ${e.message}")
+                    return@addSnapshotListener
+                }
+
+                try {
+                    if (snapshot != null) {
+                        val messages = ArrayList<Message>()
+
+                        for (doc in snapshot.documents) {
+                            val message = doc.toObject(Message::class.java)
+                            if (message != null) {
+                                messages.add(message)
+                            }
+                        }
+
+                        // เรียงลำดับตามเวลาอีกครั้ง เพื่อความแน่ใจ
+                        messages.sortBy { it.timestamp }
+
+                        Log.d(TAG, "Messages retrieved: ${messages.size}")
+                        messagesLiveData.value = messages
+
+                        // อัพเดทสถานะการอ่านข้อความ
+                        if (messages.isNotEmpty()) {
+                            updateReadStatus(chatRoomId)
+                        }
+                    } else {
+                        Log.d(TAG, "No messages snapshot data")
+                        messagesLiveData.value = emptyList()
+                    }
+                } catch (ex: Exception) {
+                    Log.e(TAG, "Error processing messages: ${ex.message}")
+                    messagesLiveData.value = emptyList()
+                }
+            }
+
+        return messagesLiveData
+    }
+
+
 
     // อัพเดทข้อความล่าสุดในห้องแชท
     private fun updateChatRoomLastMessage(chatRoomId: String, message: String, timestamp: Long) {
@@ -189,14 +261,27 @@ class ChatRepository {
     fun getChatRoomById(chatRoomId: String): LiveData<ChatRoom> {
         val chatRoomLiveData = MutableLiveData<ChatRoom>()
 
+        Log.d(TAG, "Getting chat room by ID: $chatRoomId")
+
+        if (chatRoomId.isEmpty()) {
+            Log.e(TAG, "Cannot get chat room: empty chatId")
+            chatRoomLiveData.value = ChatRoom() // Return empty chat room
+            return chatRoomLiveData
+        }
+
         chatsCollection.document(chatRoomId).get()
             .addOnSuccessListener { document ->
                 if (document != null && document.exists()) {
-                    val chatRoom = document.toObject(ChatRoom::class.java)
-                    chatRoomLiveData.value = chatRoom
-                    Log.d(TAG, "Chat room data retrieved: ${chatRoom?.id}")
+                    try {
+                        val chatRoom = document.toObject(ChatRoom::class.java)
+                        chatRoomLiveData.value = chatRoom
+                        Log.d(TAG, "Chat room data retrieved: ${chatRoom?.id}, active: ${chatRoom?.active}")
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Error converting chat room document: ${e.message}")
+                        chatRoomLiveData.value = ChatRoom() // Return empty chat room
+                    }
                 } else {
-                    Log.d(TAG, "No chat room document found for id: $chatRoomId")
+                    Log.e(TAG, "No chat room document found for id: $chatRoomId")
                     chatRoomLiveData.value = ChatRoom() // Return empty chat room
                 }
             }

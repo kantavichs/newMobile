@@ -1,5 +1,6 @@
 package com.example.sos.adapter
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,6 +16,8 @@ class ChatRoomAdapter(
     private val onItemClick: (String, Boolean) -> Unit
 ) : ListAdapter<ChatRoom, ChatRoomAdapter.ChatRoomViewHolder>(ChatRoomDiffCallback()) {
 
+    private val TAG = "ChatRoomAdapter"
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatRoomViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_chat_room, parent, false)
@@ -23,7 +26,12 @@ class ChatRoomAdapter(
 
     override fun onBindViewHolder(holder: ChatRoomViewHolder, position: Int) {
         val chatRoom = getItem(position)
-        holder.bind(chatRoom, onItemClick)
+        try {
+            holder.bind(chatRoom, onItemClick)
+            Log.d(TAG, "Binding chat room: ${chatRoom.id}, active: ${chatRoom.active}")
+        } catch (e: Exception) {
+            Log.e(TAG, "Error binding chat room: ${e.message}")
+        }
     }
 
     class ChatRoomViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -36,9 +44,12 @@ class ChatRoomAdapter(
         private val tvStatus: TextView = itemView.findViewById(R.id.tvStatus)
 
         fun bind(chatRoom: ChatRoom, onItemClick: (String, Boolean) -> Unit) {
+            // ตั้งค่าข้อมูลทั่วไป
             tvIncidentType.text = chatRoom.incidentType
+            tvLastMessage.text = chatRoom.lastMessage
+            tvLastMessageTime.text = chatRoom.getFormattedLastMessageTime()
 
-            // Show staff name if assigned, otherwise show status
+            // แสดงชื่อเจ้าหน้าที่ถ้ามี
             if (chatRoom.staffName.isNotEmpty()) {
                 tvStaffName.text = "เจ้าหน้าที่: ${chatRoom.staffName}"
                 tvStaffName.visibility = View.VISIBLE
@@ -46,10 +57,7 @@ class ChatRoomAdapter(
                 tvStaffName.visibility = View.GONE
             }
 
-            tvLastMessage.text = chatRoom.lastMessage
-            tvLastMessageTime.text = chatRoom.getFormattedLastMessageTime()
-
-            // Show unread count if there are unread messages
+            // แสดงจำนวนข้อความที่ยังไม่ได้อ่าน
             if (chatRoom.unreadCount > 0) {
                 tvUnreadCount.visibility = View.VISIBLE
                 tvUnreadCount.text = chatRoom.unreadCount.toString()
@@ -57,7 +65,7 @@ class ChatRoomAdapter(
                 tvUnreadCount.visibility = View.GONE
             }
 
-            // Show active/inactive status
+            // ตั้งค่าสถานะ (กำลังดำเนินการ/เสร็จสิ้น)
             if (chatRoom.active) {
                 tvStatus.text = "กำลังดำเนินการ"
                 tvStatus.setTextColor(itemView.context.getColor(R.color.chat_active))
@@ -68,7 +76,7 @@ class ChatRoomAdapter(
                 cardView.setCardBackgroundColor(itemView.context.getColor(R.color.chat_inactive_bg))
             }
 
-            // Set click listener
+            // ตั้งค่า click listener
             itemView.setOnClickListener {
                 onItemClick(chatRoom.id, chatRoom.active)
             }
@@ -81,7 +89,10 @@ class ChatRoomAdapter(
         }
 
         override fun areContentsTheSame(oldItem: ChatRoom, newItem: ChatRoom): Boolean {
-            return oldItem == newItem
+            return oldItem.lastMessageTime == newItem.lastMessageTime &&
+                    oldItem.active == newItem.active &&
+                    oldItem.unreadCount == newItem.unreadCount &&
+                    oldItem.staffName == newItem.staffName
         }
     }
 }
