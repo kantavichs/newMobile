@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="lavender">#8692f7</color>
+    <color name="myred">#A61802</color>
+    <color name="mylightred">#D19389</color>
+    <color name="chat_active">#4CAF50</color>
+    <color name="chat_active_bg">#E8F5E9</color>
+    <color name="chat_inactive">#757575</color>
+    <color name="chat_inactive_bg">#EEEEEE</color>
+    <color name="status_waiting">#FF9800</color>
+    <color name="status_assigned">#2196F3</color>
+    <color name="status_in_progress">#4CAF50</color>
+    <color name="status_completed">#757575</color>
+
+</resources>

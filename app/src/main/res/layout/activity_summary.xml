@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    tools:context=".report.SummaryActivity">
+
+    <!-- ส่วนหัว -->
+    <LinearLayout
+        android:id="@+id/headerLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <!-- ปุ่มย้อนกลับและชื่อหน้า -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingStart="16dp"
+            android:paddingTop="16dp"
+            android:paddingEnd="16dp">
+
+            <TextView
+                android:id="@+id/backButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableStart="@drawable/ic_back"
+                android:drawablePadding="8dp"
+                android:text="ย้อนกลับหน้าหลัก"
+                android:textColor="#B71C1C"
+                android:textSize="16sp"
+                android:contentDescription="ย้อนกลับไปหน้าแรก"
+                android:minHeight="48dp"
+                android:gravity="center_vertical" />
+        </LinearLayout>
+
+        <!-- หัวข้อ "กำลังรอเจ้าหน้าที่รับเรื่อง" -->
+        <TextView
+            android:id="@+id/tvStatusTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:text="กำลังรอเจ้าหน้าที่รับเรื่อง"
+            android:textColor="#B71C1C"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <!-- เส้นคั่น -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#CCCCCC" />
+    </LinearLayout>
+
+    <!-- ส่วนเนื้อหา -->
+    <ScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintBottom_toTopOf="@id/guideCardView"
+        app:layout_constraintTop_toBottomOf="@id/headerLayout">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- ส่วนข้อมูลผู้แจ้งเหตุ -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="ผู้แจ้งเหตุ"
+                    android:textStyle="bold"
+                    android:textColor="#B71C1C" />
+
+                <TextView
+                    android:id="@+id/tvReporterName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="กันตวิชญ์ สุรี"
+                    android:textColor="#000000" />
+            </LinearLayout>
+
+            <!-- ส่วนข้อมูลความเกี่ยวข้อง -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="เกี่ยวข้องเป็น"
+                    android:textStyle="bold"
+                    android:textColor="#B71C1C" />
+
+                <TextView
+                    android:id="@+id/tvRelation"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="เพื่อนผู้ประสบเหตุ"
+                    android:textColor="#000000" />
+            </LinearLayout>
+
+            <!-- ส่วนข้อมูลเหตุที่แจ้ง -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="เหตุ"
+                    android:textStyle="bold"
+                    android:textColor="#B71C1C" />
+
+                <TextView
+                    android:id="@+id/tvIncidentType"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="จักรยานยนต์ล้มเอง"
+                    android:textColor="#000000" />
+            </LinearLayout>
+
+            <!-- ส่วนข้อมูลสถานที่ -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="สถานที่"
+                    android:textStyle="bold"
+                    android:textColor="#B71C1C" />
+
+                <TextView
+                    android:id="@+id/tvLocation"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="สามแยกถนนลักษมณ์ศาสตร์"
+                    android:textColor="#000000" />
+            </LinearLayout>
+
+            <!-- ส่วนข้อมูลเพิ่มเติม -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="เพิ่มเติม"
+                    android:textStyle="bold"
+                    android:textColor="#B71C1C" />
+
+                <TextView
+                    android:id="@+id/tvAdditionalInfo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="เพื่อนมอบบังไม่รู้สึกตัวเลยครับ มีลูกศิษย์คนนึงช่วยดูอยู่ตอนนี้ โทรมาหาผมให้ช่วยแจ้งเหตุด่วนครับ"
+                    android:textColor="#000000" />
+            </LinearLayout>
+
+            <!-- ปุ่มแชทและโทร -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="16dp"
+                android:gravity="center">
+
+                <!-- ปุ่มแชท -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/chatButtonContainer"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    app:cardCornerRadius="30dp"
+                    app:cardBackgroundColor="#B71C1C"
+                    app:cardElevation="4dp"
+                    android:layout_marginEnd="32dp">
+
+                    <ImageView
+                        android:id="@+id/chatButton"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_message"
+                        app:tint="@color/white"
+                        android:contentDescription="แชท" />
+                </androidx.cardview.widget.CardView>
+
+                <!-- ปุ่มโทร -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/callButtonContainer"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    app:cardCornerRadius="30dp"
+                    app:cardBackgroundColor="#B71C1C"
+                    app:cardElevation="4dp">
+
+                    <ImageView
+                        android:id="@+id/callButton"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_call"
+                        android:contentDescription="โทร" />
+                </androidx.cardview.widget.CardView>
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- ส่วนคำแนะนำ -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/guideCardView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="4dp"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="8dp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:padding="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="คำแนะนำ"
+                    android:textColor="#B71C1C"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="เมื่อเกิดเหตุฉุกเฉิน"
+                    android:textColor="#B71C1C" />
+
+                <Button
+                    android:id="@+id/guideButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="#B71C1C"
+                    android:text="ดูคู่มือเอาตัวรอด"
+                    android:textColor="@color/white"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <ImageView
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:layout_gravity="center_vertical"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_accountalert"
+                android:contentDescription="ภาพประกอบคำแนะนำ" />
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

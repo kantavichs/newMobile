@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--    res/layout/fragment_home.xml-->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".home.HomeFragment">
+
+    <ImageView
+        android:id="@+id/imageView4"
+        android:layout_width="134dp"
+        android:layout_height="62dp"
+        android:layout_marginTop="5dp"
+        android:src="@drawable/logo"
+        android:contentDescription="โลโก้ SOS"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardSlider"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        app:cardBackgroundColor="@color/myred"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="20dp"
+        app:layout_constraintTop_toBottomOf="@id/imageView4">
+
+        <com.denzcoskun.imageslider.ImageSlider
+            android:id="@+id/imageSlider"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            app:iss_auto_cycle="true"
+            app:iss_corner_radius="20"
+            app:iss_delay="1000"
+            app:iss_period="1000"
+            app:iss_title_background="@drawable/gradient" />
+
+    </androidx.cardview.widget.CardView>
+
+    <!-- ลบ BottomNavigation ของ Nafis ออก -->
+
+    <TextView
+        android:id="@+id/tvReportTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="284dp"
+        android:fontFamily="@font/kanitmedium"
+        android:text="แจ้งเหตุ"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.056"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btncar"
+        android:layout_width="78dp"
+        android:layout_height="78dp"
+        android:layout_marginTop="328dp"
+        android:backgroundTint="@color/myred"
+        android:drawableTop="@drawable/ic_car"
+        android:gravity="center"
+        android:contentDescription="แจ้งเหตุอุบัติเหตุบนถนน"
+        app:cornerRadius="5dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.056"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- ส่วนที่เหลือของไฟล์เดิม -->
+    <!-- (ค้างไว้ตามเดิม) -->
+
+    <Button
+        android:id="@+id/btnsnake"
+        android:layout_width="78dp"
+        android:layout_height="78dp"
+        android:layout_marginTop="328dp"
+        android:backgroundTint="@color/myred"
+        android:drawableTop="@drawable/ic_snake"
+        android:gravity="center"
+        android:contentDescription="แจ้งเหตุจับสัตว์"
+        app:cornerRadius="5dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.357"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btnbad"
+        android:layout_width="78dp"
+        android:layout_height="78dp"
+        android:layout_marginTop="328dp"
+        android:backgroundTint="@color/myred"
+        android:drawableTop="@drawable/ic_bad"
+        android:contentDescription="แจ้งเหตุทะเลาะวิวาท"
+        app:cornerRadius="5dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.648"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btnaccountalert"
+        android:layout_width="78dp"
+        android:layout_height="78dp"
+        android:layout_marginTop="328dp"
+        android:layout_marginEnd="20dp"
+        android:backgroundTint="@color/myred"
+        android:drawableTop="@drawable/ic_accountalert"
+        android:contentDescription="แจ้งเหตุบุคคลต้องสงสัย"
+        app:cornerRadius="5dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="78dp"
+        android:layout_height="42dp"
+        android:layout_marginTop="3dp"
+        android:fontFamily="@font/kanitregular"
+        android:gravity="center"
+        android:text="อุบัติเหตุบนถนน"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.057"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btncar" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="78dp"
+        android:layout_height="42dp"
+        android:layout_marginTop="3dp"
+        android:fontFamily="@font/kanitregular"
+        android:gravity="center_horizontal"
+        android:text="จับสัตว์"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.357"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnsnake" />
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="78dp"
+        android:layout_height="42dp"
+        android:layout_marginStart="216dp"
+        android:layout_marginTop="3dp"
+        android:fontFamily="@font/kanitregular"
+        android:gravity="center_horizontal"
+        android:text="ทะเลาะวิวาท"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnbad" />
+
+    <TextView
+        android:id="@+id/textView5"
+        android:layout_width="78dp"
+        android:layout_height="42dp"
+        android:layout_marginTop="3dp"
+        android:fontFamily="@font/kanitregular"
+        android:gravity="center_horizontal"
+        android:text="บุคคลต้องสงสัย"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.939"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnaccountalert" />
+
+    <Button
+        android:id="@+id/btncarcrash"
+        android:layout_width="78dp"
+        android:layout_height="78dp"
+        android:layout_marginTop="456dp"
+        android:backgroundTint="@color/myred"
+        android:drawableTop="@drawable/ic_carcrash"
+        android:gravity="center"
+        android:contentDescription="แจ้งเหตุรถพัง"
+        app:cornerRadius="5dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.057"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btnheart"
+        android:layout_width="78dp"
+        android:layout_height="78dp"
+        android:layout_marginTop="456dp"
+        android:backgroundTint="@color/myred"
+        android:drawableTop="@drawable/ic_heart"
+        android:gravity="center"
+        android:contentDescription="แจ้งเหตุสุขภาพ"
+        app:cornerRadius="5dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.357"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btnfire"
+        android:layout_width="78dp"
+        android:layout_height="78dp"
+        android:layout_marginTop="456dp"
+        android:backgroundTint="@color/myred"
+        android:drawableTop="@drawable/ic_fire"
+        android:gravity="center"
+        android:contentDescription="แจ้งเหตุไฟไหม้"
+        app:cornerRadius="5dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.648"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btnplus"
+        android:layout_width="78dp"
+        android:layout_height="78dp"
+        android:layout_marginTop="456dp"
+        android:backgroundTint="@color/myred"
+        android:drawableTop="@drawable/ic_plus"
+        android:gravity="center"
+        android:contentDescription="แจ้งเหตุอื่นๆ"
+        app:cornerRadius="5dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.939"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textView6"
+        android:layout_width="78dp"
+        android:layout_height="42dp"
+        android:layout_marginTop="3dp"
+        android:fontFamily="@font/kanitregular"
+        android:gravity="center_horizontal"
+        android:text="รถพัง"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.057"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btncarcrash" />
+
+    <TextView
+        android:id="@+id/textView7"
+        android:layout_width="78dp"
+        android:layout_height="42dp"
+        android:layout_marginTop="3dp"
+        android:fontFamily="@font/kanitregular"
+        android:gravity="center_horizontal"
+        android:text="สุขภาพ"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.357"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnheart" />
+
+    <TextView
+        android:id="@+id/textView8"
+        android:layout_width="78dp"
+        android:layout_height="42dp"
+        android:layout_marginTop="3dp"
+        android:fontFamily="@font/kanitregular"
+        android:gravity="center_horizontal"
+        android:text="ไฟไหม้"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.648"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnfire" />
+
+    <TextView
+        android:id="@+id/textView9"
+        android:layout_width="78dp"
+        android:layout_height="42dp"
+        android:layout_marginTop="3dp"
+        android:fontFamily="@font/kanitregular"
+        android:gravity="center_horizontal"
+        android:text="อื่นๆ"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.939"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnplus" />
+
+    <TextView
+        android:id="@+id/tvGuideTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="576dp"
+        android:fontFamily="@font/kanitmedium"
+        android:text="คู่มือการเอาตัวรอด"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.054"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
