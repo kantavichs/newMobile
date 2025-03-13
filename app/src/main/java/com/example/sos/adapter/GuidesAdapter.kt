@@ -1,5 +1,6 @@
 package com.example.sos.adapter
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,7 +25,12 @@ class GuidesAdapter(
 
     override fun onBindViewHolder(holder: GuideViewHolder, position: Int) {
         val guide = getItem(position)
-        holder.bind(guide, onItemClick)
+        try {
+            holder.bind(guide, onItemClick)
+            Log.d("GuidesAdapter", "Binding guide: ${guide.id} - ${guide.title}")
+        } catch (e: Exception) {
+            Log.e("GuidesAdapter", "Error binding guide: ${e.message}")
+        }
     }
 
     class GuideViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -33,25 +39,29 @@ class GuidesAdapter(
         private val ivGuideImage: ImageView = itemView.findViewById(R.id.ivGuideImage)
 
         fun bind(guide: SurvivalGuide, onItemClick: (SurvivalGuide) -> Unit) {
-            tvTitle.text = guide.title
-            tvIncidentType.text = guide.incidentType
+            try {
+                tvTitle.text = guide.title
+                tvIncidentType.text = guide.incidentType
 
-            // Load image if available
-            if (guide.hasImage()) {
-                ivGuideImage.visibility = View.VISIBLE
-                Glide.with(itemView.context)
-                    .load(guide.imageUrl)
-                    .placeholder(R.drawable.placeholder_guide)
-                    .error(R.drawable.error_guide)
-                    .centerCrop()
-                    .into(ivGuideImage)
-            } else {
-                ivGuideImage.visibility = View.GONE
-            }
+                // Load image if available
+                if (guide.hasImage() && guide.imageUrl.isNotEmpty()) {
+                    ivGuideImage.visibility = View.VISIBLE
+                    Glide.with(itemView.context)
+                        .load(guide.imageUrl)
+                        .placeholder(R.drawable.placeholder_guide)
+                        .error(R.drawable.error_guide)
+                        .centerCrop()
+                        .into(ivGuideImage)
+                } else {
+                    ivGuideImage.visibility = View.GONE
+                }
 
-            // Set click listener to open guide details
-            itemView.setOnClickListener {
-                onItemClick(guide)
+                // Set click listener to open guide details
+                itemView.setOnClickListener {
+                    onItemClick(guide)
+                }
+            } catch (e: Exception) {
+                Log.e("GuideViewHolder", "Error in bind: ${e.message}")
             }
         }
     }

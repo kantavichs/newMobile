@@ -16,58 +16,44 @@ class GuidesRepository {
     // ดึงคู่มือเอาตัวรอดทั้งหมด
     fun getAllGuides(): LiveData<List<SurvivalGuide>> {
         val guidesLiveData = MutableLiveData<List<SurvivalGuide>>()
-
-        // เพิ่ม log เพื่อติดตามการทำงาน
-        Log.d(TAG, "Fetching all guides from Firestore")
+        Log.d(TAG, "Getting all guides from Firestore")
 
         guidesCollection
-            .orderBy("title") // เรียงตามชื่อคู่มือ
-            .get()
+            .get() // เปลี่ยนจาก orderBy("title") เป็นการดึงทั้งหมดก่อน
             .addOnSuccessListener { documents ->
-                if (!documents.isEmpty) {
-                    val guides = ArrayList<SurvivalGuide>()
+                val guides = ArrayList<SurvivalGuide>()
+                if (documents != null && !documents.isEmpty) {
+                    Log.d(TAG, "Found ${documents.size()} guide documents")
 
-                    // แปลงข้อมูลทีละเอกสาร เพื่อให้จับข้อผิดพลาดได้ง่าย
-                    for (doc in documents) {
+                    for (document in documents) {
                         try {
-                            val guide = doc.toObject(SurvivalGuide::class.java)
-                            if (guide.id.isNotEmpty()) { // ตรวจสอบว่า id ไม่ว่าง
+                            // แสดง raw data เพื่อตรวจสอบ
+                            Log.d(TAG, "Raw document data: ${document.id} => ${document.data}")
+
+                            // สร้างออบเจ็กต์ guide แบบ manual แทนการใช้ toObject
+                            val guide = SurvivalGuide(
+                                id = document.getString("id") ?: document.id,
+                                title = document.getString("title") ?: "",
+                                content = document.getString("content") ?: "",
+                                incidentType = document.getString("incidentType") ?: "",
+                                imageUrl = document.getString("imageUrl") ?: "",
+                                createdAt = (document.getTimestamp("createdAt")?.seconds ?: 0) * 1000,
+                                updatedAt = (document.getTimestamp("updatedAt")?.seconds ?: 0) * 1000
+                            )
+
+                            if (guide.title.isNotEmpty()) {
                                 guides.add(guide)
-                                Log.d(TAG, "Successfully parsed guide: ${guide.id} - ${guide.title}")
-                            } else {
-                                // กรณีที่ id ว่าง แต่ข้อมูลอื่นอ่านได้
-                                val guideWithId = guide.copy(id = doc.id)
-                                guides.add(guideWithId)
-                                Log.d(TAG, "Adding missing ID to guide: ${doc.id} - ${guide.title}")
+                                Log.d(TAG, "Added guide: ${guide.id} - ${guide.title}")
                             }
                         } catch (e: Exception) {
-                            Log.e(TAG, "Error parsing guide document ${doc.id}: ${e.message}")
-
-                            // ลองสร้างคู่มือแบบ manual จากข้อมูลดิบ
-                            try {
-                                val manualGuide = SurvivalGuide(
-                                    id = doc.id,
-                                    title = doc.getString("title") ?: "",
-                                    content = doc.getString("content") ?: "",
-                                    incidentType = doc.getString("incidentType") ?: "",
-                                    imageUrl = doc.getString("imageUrl") ?: "",
-                                    createdAt = doc.getLong("createdAt") ?: 0,
-                                    updatedAt = doc.getLong("updatedAt") ?: 0
-                                )
-                                if (manualGuide.title.isNotEmpty()) {
-                                    guides.add(manualGuide)
-                                    Log.d(TAG, "Manually created guide: ${manualGuide.id} - ${manualGuide.title}")
-                                }
-                            } catch (e2: Exception) {
-                                Log.e(TAG, "Failed to manually create guide: ${e2.message}")
-                            }
+                            Log.e(TAG, "Error parsing guide: ${e.message}")
                         }
                     }
 
                     guidesLiveData.value = guides
                     Log.d(TAG, "Total guides loaded: ${guides.size}")
                 } else {
-                    Log.d(TAG, "No guides found")
+                    Log.d(TAG, "No guides found in Firestore")
                     guidesLiveData.value = emptyList()
                 }
             }

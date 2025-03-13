@@ -9,12 +9,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import androidx.cardview.widget.CardView
 import com.denzcoskun.imageslider.ImageSlider
 import com.denzcoskun.imageslider.constants.ScaleTypes
 import com.denzcoskun.imageslider.models.SlideModel
 import com.example.sos.R
 import com.example.sos.guides.SurvivalGuidesActivity
 import com.example.sos.report.ReportActivity
+
 
 class HomeFragment : Fragment() {
 
@@ -47,6 +49,9 @@ class HomeFragment : Fragment() {
         val btnHealth = view.findViewById<Button>(R.id.btnheart)
         val btnFire = view.findViewById<Button>(R.id.btnfire)
         val btnOther = view.findViewById<Button>(R.id.btnplus)
+        val guideCardView = view.findViewById<CardView>(R.id.guideCardView)
+        val guideTitle = view.findViewById<TextView>(R.id.tvGuideTitle)
+        val btnViewGuides = view.findViewById<Button>(R.id.btnViewGuides)
 
         btnAccident.setOnClickListener { navigateToReport("อุบัติเหตุบนถนน") }
         btnAnimal.setOnClickListener { navigateToReport("จับสัตว์") }
@@ -57,12 +62,21 @@ class HomeFragment : Fragment() {
         btnFire.setOnClickListener { navigateToReport("ไฟไหม้") }
         btnOther.setOnClickListener { navigateToReport("อื่นๆ") }
 
+        val guideClickListener = View.OnClickListener {
+            val intent = Intent(requireContext(), SurvivalGuidesActivity::class.java)
+            startActivity(intent)
+        }
+
         // ตั้งค่า listener สำหรับปุ่มคู่มือเอาตัวรอด
         val guidesBanner = view.findViewById<TextView>(R.id.tvGuideTitle) // เปลี่ยนจาก textView เป็น tvGuideTitle
         guidesBanner.setOnClickListener {
             val intent = Intent(requireContext(), SurvivalGuidesActivity::class.java)
             startActivity(intent)
         }
+
+        guideCardView.setOnClickListener(guideClickListener)
+        guideTitle.setOnClickListener(guideClickListener)
+        btnViewGuides.setOnClickListener(guideClickListener)
 
         return view
     }

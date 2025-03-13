@@ -19,6 +19,9 @@ import com.example.sos.models.SurvivalGuide
 import com.example.sos.viewmodel.GuidesViewModel
 import com.google.android.material.chip.Chip
 import android.view.View
+import android.text.Html
+import com.bumptech.glide.Glide
+import com.google.firebase.firestore.FirebaseFirestore
 
 // SurvivalGuidesActivity.kt
 class SurvivalGuidesActivity : AppCompatActivity() {
@@ -67,11 +70,19 @@ class SurvivalGuidesActivity : AppCompatActivity() {
                 Log.d("SurvivalGuidesActivity", "Guide: ${guide.id} - ${guide.title} (${guide.incidentType})")
             }
 
-            allGuides = guides
-            adapter.submitList(guides)
+            // สร้างคู่มือพื้นฐานหากไม่พบข้อมูลใดๆ
+            if (guides.isEmpty()) {
+                Log.d("SurvivalGuidesActivity", "No guides found, creating basic guides")
+                val basicGuides = createBasicGuides()
+                allGuides = basicGuides
+                adapter.submitList(basicGuides)
+            } else {
+                allGuides = guides
+                adapter.submitList(guides)
+            }
 
             // แสดงข้อความว่างเมื่อไม่มีข้อมูล
-            if (guides.isEmpty()) {
+            if (allGuides.isEmpty()) {
                 binding.emptyView.visibility = View.VISIBLE
                 binding.rvGuides.visibility = View.GONE
             } else {
@@ -80,10 +91,35 @@ class SurvivalGuidesActivity : AppCompatActivity() {
             }
         }
 
+
+
         // ปุ่มย้อนกลับ
         binding.btnBack.setOnClickListener {
             finish()
         }
+    }
+
+    // ฟังก์ชันสร้างคู่มือพื้นฐานกรณีที่ไม่พบข้อมูลใน Firebase
+    private fun createBasicGuides(): List<SurvivalGuide> {
+        val guides = ArrayList<SurvivalGuide>()
+
+        // คู่มืออุบัติเหตุบนถนน
+        guides.add(SurvivalGuide(
+            id = "basic001",
+            title = "วิธีปฐมพยาบาลเบื้องต้นเมื่อเกิดอุบัติเหตุบนท้องถนน",
+            content = "1. ตรวจสอบความปลอดภัยของพื้นที่เกิดเหตุ\n2. ประเมินอาการผู้บาดเจ็บเบื้องต้น\n3. โทรแจ้งเหตุที่ 1669 ให้ข้อมูลสถานที่ชัดเจน\n4. ถ้าผู้บาดเจ็บไม่รู้สึกตัว ให้จับชีพจรและตรวจดูการหายใจ\n5. ห้ามเคลื่อนย้ายผู้บาดเจ็บหากสงสัยว่ากระดูกสันหลังบาดเจ็บ",
+            incidentType = "อุบัติเหตุบนถนน"
+        ))
+
+        // คู่มือเจอสัตว์มีพิษ
+        guides.add(SurvivalGuide(
+            id = "basic002",
+            title = "วิธีรับมือเมื่อพบงูพิษในบริเวณมหาวิทยาลัย",
+            content = "1. รักษาความสงบ ไม่ตื่นตระหนก\n2. ถอยห่างจากงูอย่างช้าๆ\n3. แจ้งเจ้าหน้าที่รักษาความปลอดภัย\n4. ไม่พยายามจับหรือไล่งูด้วยตนเอง\n5. หากถูกงูกัด ให้นั่งนิ่งๆ และรีบไปพบแพทย์ทันที",
+            incidentType = "จับสัตว์"
+        ))
+
+        return guides
     }
 
     private fun setupSearch() {
@@ -200,7 +236,14 @@ class SurvivalGuidesActivity : AppCompatActivity() {
         val btnClose = dialog.findViewById<Button>(R.id.btnCloseGuide)
 
         tvTitle.text = guide.title
-        tvContent.text = guide.content
+
+        // แปลง HTML content เป็นข้อความที่แสดงผลได้
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            tvContent.text = Html.fromHtml(guide.content.replace("\n", "<br>"), Html.FROM_HTML_MODE_COMPACT)
+        } else {
+            @Suppress("DEPRECATION")
+            tvContent.text = Html.fromHtml(guide.content.replace("\n", "<br>"))
+        }
 
         btnClose.setOnClickListener {
             dialog.dismiss()
