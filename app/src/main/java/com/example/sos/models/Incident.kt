@@ -1,4 +1,3 @@
-// app/src/main/java/com/example/sos/models/Incident.kt
 package com.example.sos.models
 
 import java.text.SimpleDateFormat
@@ -8,14 +7,14 @@ import java.util.Locale
 data class Incident(
     val id: String = "",
     val reporterId: String = "",
-    val reporterName: String = "", // เก็บชื่อผู้แจ้งเหตุไว้เพื่อลดการเรียก query
-    val incidentType: String = "", // อุบัติเหตุบนถนน, จับสัตว์, ทะเลาะวิวาท, etc.
+    val reporterName: String = "",
+    val incidentType: String = "",
     val location: String = "",
-    val relationToVictim: String = "", // ผู้ประสบเหตุ, ผู้เห็นเหตุการณ์, เพื่อนผู้ประสบเหตุ
+    val relationToVictim: String = "",
     val additionalInfo: String = "",
-    val status: String = "รอรับเรื่อง", // รอรับเรื่อง, เจ้าหน้าที่รับเรื่องแล้ว, กำลังดำเนินการ, เสร็จสิ้น
+    val status: String = "รอรับเรื่อง",
     val assignedStaffId: String = "",
-    val assignedStaffName: String = "", // เก็บชื่อเจ้าหน้าที่ไว้เพื่อลดการเรียก query
+    val assignedStaffName: String = "",
     val reportedAt: Long = System.currentTimeMillis(),
     val lastUpdatedAt: Long = System.currentTimeMillis(),
     val completedAt: Long? = null

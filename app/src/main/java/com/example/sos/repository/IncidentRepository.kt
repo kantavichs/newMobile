@@ -37,13 +37,10 @@ class IncidentRepository {
                     return@addSnapshotListener
                 }
 
-                if (snapshot != null && !snapshot.isEmpty) {
-                    val incidents = snapshot.toObjects(Incident::class.java)
-                    incidentsLiveData.value = incidents
-                    Log.d(TAG, "Active incidents retrieved: ${incidents.size}")
+                incidentsLiveData.value = if (snapshot != null && !snapshot.isEmpty) {
+                    snapshot.toObjects(Incident::class.java)
                 } else {
-                    Log.d(TAG, "No active incidents found")
-                    incidentsLiveData.value = emptyList()
+                    emptyList()
                 }
             }
 

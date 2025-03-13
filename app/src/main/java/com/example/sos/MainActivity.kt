@@ -21,9 +21,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var registerButton: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // ตรวจสอบ locale ปัจจุบันและเปลี่ยนเป็นภาษาไทยถ้าไม่ได้ตั้งค่าเป็นภาษาไทยหรืออังกฤษ
         val config = resources.configuration
         val locales = ConfigurationCompat.getLocales(config)
-        if (locales.isEmpty || (locales[0] != Locale.ENGLISH && locales[0]?.language != "th")) {
+        if (locales.isEmpty || (locales[0] != Locale("th") && locales[0] != Locale.ENGLISH)) {
             val newConfig = Configuration(config)
             val newLocales = LocaleListCompat.create(Locale("th"), Locale.ENGLISH)
             ConfigurationCompat.setLocales(newConfig, newLocales)

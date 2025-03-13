@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "122548909838",
-    "project_id": "kkuemergency",
-    "storage_bucket": "kkuemergency.firebasestorage.app"
+    "project_number": "342043277852",
+    "project_id": "kkuemergencyclientnew",
+    "storage_bucket": "kkuemergencyclientnew.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:122548909838:android:6c4b63bd2e0d3ee1e8895f",
+        "mobilesdk_app_id": "1:342043277852:android:e2c64e265d06e7358bbdd9",
         "android_client_info": {
           "package_name": "com.example.sos"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCiLIX9AHbddXWOQrFUvXPrcoyZmHbvT-8"
+          "current_key": "AIzaSyCPWpOUTitoIKOf_pCVjznLeRJy32Rjl7Y"
         }
       ],
       "services": {
